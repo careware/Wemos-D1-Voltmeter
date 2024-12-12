@@ -1,0 +1,28 @@
+function importThingSpeakData() {
+var channelID = "27346"; // Replace with your ThingSpeak channel ID
+var apiKey = "EFO6QPDQGD9ZG"; // Replace with your ThingSpeak API key
+var sheetName = "Sheet3"; // Replace with the name of your target sheet
+
+const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=1`;
+var response = UrlFetchApp.fetch(url);
+var data = JSON.parse(response.getContentText());
+
+var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName); 1
+var lastRow = sheet.getLastRow();
+
+for (var i = 0; i < data.feeds.length; i++) {
+var row = lastRow + i + 1;
+var timestamp = data.feeds[i].created_at; // Get the timestamp
+
+// Create a Date object from the timestamp
+var dateObject = new Date(timestamp);
+
+// Format the date and time in Pakistan Standard Time (PST)
+var pstTime = dateObject.toLocaleString('en-UK', { timeZone: 'Asia/Karachi' });
+
+// Set the value in the spreadsheet (PST time)
+sheet.getRange(row, 1).setValue(pstTime);
+sheet.getRange(row, 2).setValue(data.feeds[i].field1);
+// Add more columns as needed for other fields
+}
+}
